@@ -35,10 +35,6 @@ For the design and simulation of the BGR circuit we will need the following tool
 - Layout Design and DRC - [Magic]
 - LVS - [Netgen]
 
-#### 1.1.3 Netgen
-
-[Netgen] is a tool for comparing netlists, a process known as LVS, which stands for "Layout vs. Schematic". This is an important step in the integrated circuit design flow, ensuring that the geometry that has been laid out matches the expected circuit.
-
 ### 1.2 PDK setup
 
 A process design kit (PDK) is a set of files used within the semiconductor industry to model a fabrication process for the design tools used to design an integrated circuit. The PDK is created by the foundry defining a certain technology variation for their processes. It is then passed to their customers to use in the design process.
@@ -54,7 +50,7 @@ A Bandgap Voltage Reference (BGR) works by adding two opposing voltages. One vol
 </p>
 
 #### 2.1.1 CTAT Voltage Generation
-Usually semiconductor diodes shows CTAT behaviour. If we consider constant current is flowing through a forwrard biased diode, then with increase in temp. we can observe that the voltage across the diode is decreaseing. Generally, it is found that the slope of the V~Temp is -2mV/deg Centigarde.
+
 <p align="center">
   <img src="Images/CTAT.png">
 </p>
@@ -64,33 +60,6 @@ Usually semiconductor diodes shows CTAT behaviour. If we consider constant curre
   <img src="Images/Equation.png">
 </p>
 
-From Diode current equation we can find that it has two parts, i.e. 
-
-- Vt (Thermal Voltage) which is directly proportional to the temp. (order ~ 1)
-- Is (Reverse saturation current) which is directly proportional to the temp. (order ~ 2.5), as this Is term is in denominator so with increase in temp. the ln(Io/Is) decreases which is responsible for CTAT nature of the diode.
-
-So to get a PTAT Voltage generation circuit we have to find some way such that we can get the Vt separated from Is.
-
-To get Vt separated from Is we can approach in the following way
-<p align="center">
-  <img src="Images/PTATCKT.png">
-</p>
-
-In the above circuit same amount of current I is flowing in both the branches. So the node voltage A and B are going to be same V. Now in the B branch if we substract V1 from V, we get Vt independent of Is.
-<p align="center">
-  <img src="Images/PTATEQN.png">
-</p>
-Now
-
-```
-V= Combined Voltage across R1 and Q2 (CTAT in nature but less sloppy)
-V1= Voltage across Q2 (CTAT in nature but more sloppy)
-V-V1= Voltage across R1 (PTAT in nature)
-```
-From above we can see that the voltage V-V1 is PTAT in nature, but it's slope is very less as compared to the CTAT, so we have to increase the slope. In order to increase the slope we can use multiple BJTs as diode, so that current per individual diode will be less and it the slope of V-V1 will increase.
-<p align="center">
-  <img src="Images/PTAT.png">
-</p>
 
 ### 2.2 Types of BGR
 Architecture wise BGR can be designed in two ways
@@ -104,9 +73,7 @@ Application wise BGR can be categorized as
 - High-PSRR and low-noise BGR
 - Curvature compensated BGR
 
-We are going to design our BGR circuit using Self-biased current mirror architecture.
-
-### 2.3 Self-biased current mirror based BGR
+### 2.3 Self-biased current mirror based BGR Circuit
 
 The Self-biased current mirror based constitute of the following components.
 
@@ -116,41 +83,8 @@ The Self-biased current mirror based constitute of the following components.
 - Reference branch circuit
 - Start-up circuit
 
-#### 2.3.1 CTAT Voltage generation circuit
-The CTAT Voltage generation circuit consist of a BJT connected as a diode, which shows CTAT nature as explained above.
-<p align="center">
-  <img src="Images/CTAT1.png">
-</p>
 
-#### 2.3.2 PTAT Voltage generation circuit
-The PTAT Voltgae generation circuit consist of **N** BJTs connected with a series resistance. The operation principle is explained above.
-<p align="center">
-  <img src="Images/PTAT1.png">
-</p>
 
-#### 2.3.3 Self-Biased Current Mirror Circuit
-The Self-biased current mirror is a type of current mirror which requires no external biasing. This current mirrors biases it self to the desired current value without any external current source reference. 
-<p align="center">
-  <img src="Images/currentmirror.png">
-</p>
-
-#### 2.3.4 Reference Branch Circuit
-The reference circuit branch performs the addition of CTAT and PTAT volages and gives the final reference voltage. We are using a mirror transitor and a BJT as diode in the reference branch. By virtue of the mirror transistor in the reference branch the same amount of current flows through it as of the current mirror branches. Now from the PTAT circuit branch we are getting PTAT voltage and PTAT current. The same PTAT current is flowing in the reference branch. But the slope of PTAT voltage is much more smaller than that of slope of CTAT voltgae. In order to make increase the voltage slope we have to increase the resistance (current constant, so V increases with increase in R). Now across the high resistance we will get our constant reference voltage which is the result of CTAT Voltage + PTAT Voltage.
-<p align="center">
-  <img src="Images/refbranch1.png">
-</p>
-
-#### 2.3.5 Start-up circuit
-The start-up circuit is required to move out the self biased current mirror from degenerative bias point (zero current). The start-up circuit forecefully flows a slow amount of current through the self-biased current mirror when the current is 0 in the current mirror branches, as the current mirror is self biased this small current creats a disturbance and the current mirror auto biased to the desired current value.
-<p align="center">
-  <img src="Images/startup.png">
-</p>
-
-#### 2.3.6 Complete BGR Circuit
-Now by connecting all above components we can get the complete BGR circuit.
-<p align="center">
-  <img src="Images/fullbgr.png">
-</p>
 Advantages of SBCM BGR:
 
 - Simplest topology
@@ -165,9 +99,8 @@ Limitations of SBCM BGR:
 - Need start-up circuit
 
 ## 3. Design and Pre-layout Simulation
-For the real-time circuit design we are going to use sky130 technology PDK. Before we design the complete circuit we must know what are our design requirements. The design requirements are the design guidelines which our design must satisfy.
 
-### 3.1 Design Requirements
+### 3.1 Design Specification 
 - Supply voltage = 1.8V
 - Temperature: -40 to 125 Deg Cent.
 - Power Consumption < 60uW
@@ -175,33 +108,6 @@ For the real-time circuit design we are going to use sky130 technology PDK. Befo
 - Start-up time < 2us
 - Tempco. Of Vref < 50 ppm
 
-Now, we have to go through the device data sheet to find the appropriate devices for our design. 
-
-After thoroughly going through the device data sheet we selected the following devices for our design.
-### 3.2 Device Data Sheet
-***1. MOSFET***
-| Parameter | NFET | PFET |
-| :-: | :-: | :-: |
-| **Type** | LVT | LVT |
-| **Voltage** | 1.8V | 1.8V |
-| **Vt0** | ~0.4V | ~-0.6V |
-| **Model** | sky130_fd_pr__nfet_01v8_lvt | sky130_fd_pr__pfet_01v8_lvt |
-
-***2. BJT (PNP)***
-| Parameter | PNP | 
-| :-: | :-: | 
-| **Current Rating** | 1uA-10uA/um2 | 
-| **Beta** | ~12 |
-| **Vt0** | 11.56 um2 | 
-| **Model** | sky130_fd_pr__pnp_05v5_W3p40L3p40 |
-
-***3. RESISTOR (RPOLYH)***
-| Parameter | RPOLYH | 
-| :-: | :-: | 
-| **Sheet Resistance** | ~350 Ohm | 
-| **Tempco.** | 2.5 Ohm/Deg Cent |
-| **Bin Width** | 0.35u, 0.69u, 1.41u, 5.37u | 
-| **Model** | sky130_fd_pr__res_high_po |
 
 ### 3.3 Circuit Design
 
@@ -252,38 +158,12 @@ After thoroughly going through the device data sheet we selected the following d
 As we are not using any schematic editor we have to write the spice netlist and simulate it using Ngspice.
 
 **Steps to write a netlist**
-- Create a file with ***.sp*** extension, open with any editor like gvim/vim/nano.
-- The 1st line of the Spice netlist is by default a comment line.
-- To write a valid netlist we must include the library file (with absolute path) and mention the cornmer name (tt, ff or ss). Ex- 
-```
-.lib "/home/<path-to-lib>/sky130.lib.spice" tt
-```
-- Now, if we are using the **sky130_fd_pr__pnp_05v5_W3p40L3p40** model, we have to include the that file also.
-```
-.include "/home/<path-to-model>/sky130_fd_pr__model__pnp.model.spice"
-```
-- Syntax for independent voltage/current source is:
-```
-Vxx n1 n2 dc 1.8 : *Vxx* - Voltage source, *n1* - Node-1 of voltage source, *n2* - Node-2 of voltage source, *dc* - Type (can be dc/ac) *1.8* - value
-Ixx n1 n2 dc 10u : *Ixx* - Current source, *n1* - Node-1 of current source, *n2* - Node-2 of current source, *dc* - Type (can be dc/ac) *1.8* - value
-```
-- Syntax for DC simulation
-```
-.dc temp -40 125 5 : Simulate for temp varying from -40 to 125 with 5 dec cent step
-.dc Vs1 0 1.8 0.01 : Simulate for Vs1 varying from 0V to 1.8V with 0.01V step
-```
 
 #### 3.4.1 CTAT Simulation
 
 **CTAT Voltage generation with single BJT** [netlist](/prelayout/ctat_voltage_gen.sp)
 
 In this simulation we take a BJT as a diode, Provide a Current source of 10uA and we need to find the volatge variation across the BJT with respect to the temp.
-
-We expect to get a straight line with negative slope, i.e. a CTAT voltage (With rise in temp. the voltage should decrease across the BJT). To launch the simulation open terminal and write the following command in the prelayout folder.
-```
-$ ngspice ctat_voltage_gen.sp
-```
-*If it doesn't work, please check your local path
 
 After simulation we can get a wavefrom like below, and from the wavefrom we can see the CTAT behaviour of the BJT, and can find the slope.
 <p align="center">
@@ -305,8 +185,6 @@ In this simulation we will check the CTAT voltage dependancy on current.
 <p align="center">
   <img src="Images/prelayout/ctat_cur.png">
 </p>
-
-We can find that the voltage is decreasing with decrease in current value.
 
 #### 3.4.2 PTAT Simulation
 
