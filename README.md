@@ -3,9 +3,6 @@ This github repository is for the design of a Band Gap Reference Circuit (BGR) u
 
 ## Introduction to BGR
 The Bandgap Reference (BGR) is a circuit which provides a stable voltage output which is independent of factors like temperature, supply voltage. 
-<p align="center">
-  <img src="Images/BGR1.png">
-</p>
 
 ### Applications of BGR
 - Low dropout regulators (LDO)
