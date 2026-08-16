@@ -197,7 +197,7 @@ Tempco. Of Vref = ~45 PPM
 
 #### 3.4.6 Extracted Netlist
 <img width="835" height="781" alt="image" src="https://github.com/user-attachments/assets/b42158fe-c25e-4aba-b7bc-da103575698b" />
-
+ Thank you
 
 
 
