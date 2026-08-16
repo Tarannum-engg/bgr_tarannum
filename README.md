@@ -45,20 +45,17 @@ The PDK we are going to use for this BGR is Google Skywater-130 (130 nm) PDK.
 
 ### 2.1 BGR Principle
 A Bandgap Voltage Reference (BGR) works by adding two opposing voltages. One voltage goes down as temperature rises, and the other goes up. When added together, they cancel each other out. This creates a stable voltage of about 1.25V that does not change when the temperature changes.
-<p align="center">
-  <img src="Images/BGR_Principle.png">
-</p>
+<img width="749" height="455" alt="image" src="https://github.com/user-attachments/assets/8e89b95e-737a-4b0f-9cfa-5037ad5db526" />
+
 
 #### 2.1.1 CTAT Voltage Generation
 
-<p align="center">
-  <img src="Images/CTAT.png">
-</p>
+<img width="668" height="249" alt="image" src="https://github.com/user-attachments/assets/da7e3e19-6d8b-4e15-8b16-4128beead250" />
+
 
 #### 2.1.2 PTAT Voltage Generation
-<p align="center">
-  <img src="Images/Equation.png">
-</p>
+
+<img width="804" height="405" alt="image" src="https://github.com/user-attachments/assets/2b0986a2-43df-4d12-8b0c-461333688199" />
 
 
 ### 2.2 Types of BGR
@@ -148,106 +145,41 @@ Limitations of SBCM BGR:
 - Finally the size is **L=1u, W=5u and M=8**
 
 #### 3.3.1 Final Circuit
-<p align="center">
-  <img src="Images/finalbgr.png">
-</p>
+<img width="751" height="490" alt="image" src="https://github.com/user-attachments/assets/1b77d337-819e-4e62-b69c-c8c6fae8278c" />
 
 ### 3.4 Writing Spice netlist and Pre-layout simulation
 As we are not using any schematic editor we have to write the spice netlist and simulate it using Ngspice.
 
-**Steps to write a netlist**
-
-#### 3.4.1 CTAT Simulation
-
-**CTAT Voltage generation with single BJT** [netlist](/prelayout/ctat_voltage_gen.sp)
-
-In this simulation we take a BJT as a diode, Provide a Current source of 10uA and we need to find the volatge variation across the BJT with respect to the temp.
-
-After simulation we can get a wavefrom like below, and from the wavefrom we can see the CTAT behaviour of the BJT, and can find the slope.
-<p align="center">
-  <img src="Images/prelayout/ctat@2v.PNG">
-</p>
-
-**CTAT Voltage generation with Multiple BJT** [netlist](/prelayout/ctat_voltage_gen_mul_bjt.sp)
-
-In this simulation we will check the CTAT voltage across the 8 parallel connected BJTs.
-<p align="center">
-  <img src="Images/prelayout/ctat_mul_bjt.png">
-</p>
-
-As we can see the slope is increasing in case of multiple BJTs.
-
-**CTAT Voltage generation with different current source values** [netlist](prelayout/ctat_voltage_gen_var_current.sp)
-
-In this simulation we will check the CTAT voltage dependancy on current.
-<p align="center">
-  <img src="Images/prelayout/ctat_cur.png">
-</p>
-
-#### 3.4.2 PTAT Simulation
-
-**PTAT Voltage generation with ideal current source** [netlist](/prelayout/ptat_voltage_gen_ideal_current_source.sp)
-
-In this simulation we will take one ideal current source and will connect it to 5K Ohm resistance and 8 parallel BJTs. From this we will find the voltgae difference between the two terminals of the resistnce, which will give us a slightly PTAT voltage.
-<p align="center">
-  <img src="Images/prelayout/ptat_cir.png">
-</p>
-
-We can find that the voltage V(ra1)-V(qp2) is increasing with temp. which is the desired PTAT voltage.
-
-**PTAT Voltage generation with VCVS** [netist](/prelayout/ptat_voltage_gen.sp)
-
-In this simulation we will check the amplified PTAT voltage using one VCVS.
-<p align="center">
-  <img src="Images/prelayout/ptat_vcvs.png">
-</p>
-
-
-#### 3.4.3 Resistance tempco.
-
-We know that resistor also behaves as PTAT, i.e the voltage across the resistor also increases with increase in the temp. In our BGR the PTAT voltage we are getting is not only by the virtue of Vt(Thermal voltgae) but with the additional PTAT voltage of the resistance.
-
-In this simulation we will check the tempco. of resistor using ideal current source of 10uA. [netlist](/prelayout/res_tempco.sp)
-<p align="center">
-  <img src="Images/prelayout/res_tempco_v.png">
-</p>
-
-From the above curve we can find that the Voltage across the resistnace is increasing with increase in temp., i.e. the PTAT nature.
-
-Now to find the temco. we have to find the change in resistance w.r.t temp. The tempco. can be found from the slope of the following curve.
-<p align="center">
-  <img src="Images/prelayout/res_tempco.png">
-</p>
-
-Also we can find the PTAT voltages across the resistance for different current values from the following curve. [netlist](prelayout/res_tempco_var_current.sp)
-<p align="center">
-  <img src="Images/prelayout/res_tempco_var_i.png">
-</p>
-
-#### 3.4.4 BGR using Ideal OpAmp
+#### 3.4.1 BGR using Ideal OpAmp
 
 Now after simulating all our components, let's quick check our BGR behaviour using one VCVS as an ideal OpAmp. [netlist](/prelayout/bgr_using_ideal_opamp.sp)
 
 In this simulation we should get the reference voltgae as an umbrella shaped curve and it should be ~1.2V.
-<p align="center">
-  <img src="Images/prelayout/ideal_bgr.png">
-</p>
+<img width="739" height="560" alt="image" src="https://github.com/user-attachments/assets/09c7bcd6-e59d-4c79-8ea7-9dc5247ce65a" />
 
-#### 3.4.5 BGR with SBCM
+<img width="731" height="560" alt="image" src="https://github.com/user-attachments/assets/5691e799-7846-411f-aa21-e94931c0d024" />
+
+<img width="738" height="572" alt="image" src="https://github.com/user-attachments/assets/90b29070-b719-4422-8ff0-ee8f87805fe6" />
+
+
+#### 3.4.5 BGR with SBCM Pre Simulation
 
 Now we will replace the ideal Op-Amp with self-biased current mirror which is our proposed design. We expect same type of output as in case of ideal OpAmp based BGR. We will also check for different corners, and will see how our circuit is performing in different corners.
 
-- Behaviour in TT corner [netlsit](/prelayout/bgr_lvt_rpolyh_3p40.sp)
-<p align="center">
-  <img src="Images/prelayout/bgr_tt.png">
-</p>
+<img width="844" height="618" alt="image" src="https://github.com/user-attachments/assets/a35f0b05-ebb1-4853-8a73-ec90e891cb8e" />
 
+1. Vref vs temp
+- Behaviour in TT corner [netlsit](/prelayout/bgr_lvt_rpolyh_3p40.sp)
+<img width="742" height="567" alt="image" src="https://github.com/user-attachments/assets/57ae79ba-2492-467f-b27c-e22961429be3" />
 Tempco. Of Vref = ~21.7 PPM
 
+- Behaviour in SS corner
+<img width="634" height="572" alt="image" src="https://github.com/user-attachments/assets/4a9007a2-a5b5-424b-9faa-067b25b56595" />
+
+Tempco. Of Vref = ~43 PPM
+
 - Behaviour in FF corner [netlist](/prelayout/bgr_lvt_rpolyh_3p40_ff.sp)
-<p align="center">
-  <img src="Images/prelayout/bgr_ff.png">
-</p>
+<img width="632" height="573" alt="image" src="https://github.com/user-attachments/assets/7fe7f7c8-6f23-4672-8085-15c773a54ce8" />
 
 Tempco. Of Vref = ~10 PPM
 
@@ -257,6 +189,17 @@ Tempco. Of Vref = ~10 PPM
 </p>
 
 Tempco. Of Vref = ~45 PPM
+
+2. Vref vs Vdd
+   
+<img width="634" height="569" alt="image" src="https://github.com/user-attachments/assets/d83403ac-6f0c-4714-9e45-73faf7189f23" />
+
+3. transient 
+
+<img width="620" height="557" alt="image" src="https://github.com/user-attachments/assets/ab6e8bf0-ba81-45a0-8586-1f27b1b0700b" />
+
+#### 3.4.6 Extracted Netlist
+<img width="835" height="781" alt="image" src="https://github.com/user-attachments/assets/b42158fe-c25e-4aba-b7bc-da103575698b" />
 
 
 
